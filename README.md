@@ -9,3 +9,6 @@ pip3 install datetime
 pip3 install twstock
 
 pip3 install lxml
+
+# 代理
+http://proxy-list.org/english/index.php
