@@ -1,4 +1,4 @@
-# stock
+# 爬股市資料並且寄送訊息
 
 pip3 install requests
 
