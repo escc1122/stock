@@ -65,7 +65,7 @@ while 1:
                     # print (accumulate_trade_volume/yestoday_trade_volum)
                     # _open = float(realtime['open'])
                     high = float(realtime['high'])
-                    if high/yestoday_close_price>1.03 and accumulate_trade_volume/yestoday_trade_volum>=1:
+                    if high/yestoday_close_price>1.03 and accumulate_trade_volume/yestoday_trade_volum>=:
                         send_stock_array.append(id)
                         send_message = send_message + "<code>" + id + " : " + name + "</code>\n"
             else:
