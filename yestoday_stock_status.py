@@ -68,32 +68,4 @@ def insertTable(ids):
 
 for ids in newarr:
     insertTable(ids)
-    # stocks = twstock.realtime.get(ids.tolist())
-    # customer_db.get_connect()
-    # conn = customer_db.get_connect()
-    # cursor = conn.cursor()
-    # print(stocks['success'] )
-    # if stocks['success'] == True:
-    #     for id in ids:
-    #         if id not in twstock.twse:
-    #             print("test " + id)
-    #             twstock.twse[id] ={}
-    #         if id in stocks:
-    #             realtime = stocks[id]['realtime']
-    #             latest_trade_price = realtime['latest_trade_price']
-    #             if latest_trade_price == '-':
-    #                 latest_trade_price = '-1'
-    #             cursor.execute("INSERT INTO yestoday_stock_status (stock_id, trade_volume, close_price) VALUES (%s, %s, %s) on conflict (stock_id) do update set trade_volume=%s;", (id,realtime['accumulate_trade_volume'],latest_trade_price,realtime['accumulate_trade_volume']))
-    #         else:
-    #             print("id no found " + id)
-    #             no_found_id.append(id)
-    #             cursor.execute("INSERT INTO yestoday_stock_status (stock_id, trade_volume, close_price) VALUES (%s, %s, %s) on conflict (stock_id) do update set trade_volume=0;", (id,'-1','-1'))
-    # else:
-    #     print('ttt' )
-    #     error_ids.append(ids)
-        # for id in ids:
-        #     cursor.execute("INSERT INTO yestoday_stock_status (stock_id, trade_volume, close_price) VALUES (%s, %s, %s) on conflict (stock_id) do update set trade_volume=0;", (id,'0','1'))
-    # conn.commit()
-    # cursor.close()
-    # conn.close()
     time.sleep(20)
