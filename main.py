@@ -11,6 +11,8 @@ import time
 import requests
 from twstock.proxy import RoundRobinProxiesProvider
 import config
+import sys
+import traceback
 
 
 def send_msg(send_message):
@@ -61,17 +63,23 @@ while 1:
                     accumulate_trade_volume = int(realtime['accumulate_trade_volume'])
                     yestoday_trade_volum = int(yestoday_stock_status[id]['trade_volume'])
                     yestoday_close_price = float(yestoday_stock_status[id]['close_price'])
-                    
-                    # print (accumulate_trade_volume/yestoday_trade_volum)
-                    # _open = float(realtime['open'])
                     high = float(realtime['high'])
                     if high/yestoday_close_price>1.03 and accumulate_trade_volume/yestoday_trade_volum>=2:
                         send_stock_array.append(id)
                         send_message = send_message + "<code>" + id + " : " + name + "</code>\n"
             else:
                 print('http error')
-        except:
-          print("An exception occurred")
+        except Exception as e:
+            print("An exception occurred")
+            error_class = e.__class__.__name__ #取得錯誤類型
+            detail = e.args[0] #取得詳細內容
+            cl, exc, tb = sys.exc_info() #取得Call Stack
+            lastCallStack = traceback.extract_tb(tb)[-1] #取得Call Stack的最後一筆資料
+            fileName = lastCallStack[0] #取得發生的檔案名稱
+            lineNum = lastCallStack[1] #取得發生的行號
+            funcName = lastCallStack[2] #取得發生的函數名稱
+            errMsg = "File \"{}\", line {}, in {}: [{}] {}".format(fileName, lineNum, funcName, error_class, detail)
+            print(errMsg)
 
            
         
