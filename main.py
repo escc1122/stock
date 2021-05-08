@@ -66,6 +66,7 @@ while 1:
     newarr = np.array_split(stock_array, int(len(stock_array)/150)+1)
     
     for ids in newarr:
+        print(ids)
         send_message=''
         stocks = {}
         try:
@@ -120,12 +121,11 @@ while 1:
         # condtion2.clean_message()
         conditions.clean_message()
         time.sleep(20)
-        break #out
     
     
 
-    if len(send_stock_array)>0:
-        for key in send_stock_array:
-            del yestoday_stock_status[key]
-            print(key)
+    # if len(send_stock_array)>0:
+    #     for key in send_stock_array:
+    #         del yestoday_stock_status[key]
+    #         print(key)
         

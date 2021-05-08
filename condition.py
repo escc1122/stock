@@ -18,12 +18,18 @@ class Runtime_stock_data():
         self._stock_id = id
         self._name = ''
         try:
-            realtime = stocks[id]['realtime']
-            self._name = stocks[id]['info']['name']
-            self._accumulate_trade_volume = int(realtime['accumulate_trade_volume'])
-            self._high = float(realtime['high'])
+            if id in stocks:
+                realtime = stocks[id]['realtime']
+                self._name = stocks[id]['info']['name']
+                self._accumulate_trade_volume = int(realtime['accumulate_trade_volume'])
+                self._high = float(realtime['high'])
+            else:
+                print("id no found id : {}",id)
         except:
             print("An exception occurred id : " + id)
+            print("An exception occurred accumulate_trade_volume : {} : " , realtime['accumulate_trade_volume'])
+            print("An exception occurred high: {} : " , realtime['high'])
+
         
     @property
     def accumulate_trade_volume(self):
