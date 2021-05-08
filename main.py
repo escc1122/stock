@@ -40,7 +40,6 @@ yestoday_stock_status_keys = yestoday_stock_status.keys()
 
 count=0
 
-
 # 條件 start
 conditions = condition.Conditions()
 # 盤中漲幅超過 3% , 交易量超過 1.5 倍
@@ -61,9 +60,10 @@ while 1:
     for stock_id in yestoday_stock_status_keys:
         stock_array.append(stock_id)
         
-    
-    newarr = np.array_split(stock_array, int(len(stock_array)/100))
-    # newarr = np.array_split(stock_array, 1)
+        
+    # test
+    # stock_array = ["2615","2537","3059","4952"]
+    newarr = np.array_split(stock_array, int(len(stock_array)/150)+1)
     
     for ids in newarr:
         send_message=''

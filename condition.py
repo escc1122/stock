@@ -128,18 +128,37 @@ class PriceAndVolumeCondition(Condition):
         super().__init__(yestoday_stock_status)
         self._price_market = 0
         self._volume_market = 0
+        self.__send_message_list = []
         
     def __init__(self,yestoday_stock_status,price_market=1.03,volume_market=2):
         super().__init__(yestoday_stock_status)
         self._price_market = price_market
         self._volume_market = volume_market
-        self._send_message_title = "<code>漲幅超過 {} , 交易量超過 {} 倍</code>\n".format(price_market, volume_market)
+        self.__send_message_list = []
+        self._send_message_title = "<code>漲幅超過 {} ,交易量超過 {}</code>\n".format("{:.2%}".format(price_market-1), "{:.0%}".format(volume_market))
+
+    def __sort():
+        pass
+    
+    def get_send_message(self):
+        send_message = ''
+        msg = ''
+        self.__send_message_list.sort(key=lambda one_data: one_data[3],reverse=True)
+        for one_data in self.__send_message_list:
+            send_message = send_message + "<code>{} :{},交易量:{},漲幅{}</code>\n".format(one_data[0],one_data[1],"{:.0%}".format(one_data[3]),"{:.2%}".format(one_data[2]-1))
+        if not send_message=='':
+            msg = self._send_message_title + send_message  
+        return msg
+    
+    def clean_message(self):
+        self._send_message = ''  
+        self.__send_message_list = []
 
         
     def set_conition_price_and_volume_market(self,price_market=1.03,volume_market=2):
         self._price_market = price_market
         self._volume_market = volume_market
-        self._send_message_title = "<code>漲幅超過 {} , 交易量超過 {} 倍</code>\n".format(price_market, volume_market)
+        self._send_message_title = "<code>漲幅超過 {} , 交易量超過 {} 倍</code>\n".format("{:.2%}".format(price_market-1), "{:.0%}".format(volume_market))
         
     def check(self,runtime_stock_data):
         # send_message = ''
@@ -151,9 +170,12 @@ class PriceAndVolumeCondition(Condition):
             name = runtime_stock_data.name
             yestoday_trade_volum = int(self._yestoday_stock_status[id]['trade_volume'])
             yestoday_close_price = float(self._yestoday_stock_status[id]['close_price'])
-            if id not in self._no_seed_stock_id and high/yestoday_close_price>=self._price_market and accumulate_trade_volume/yestoday_trade_volum>=self._volume_market:
+            runtime_price_market = high/yestoday_close_price
+            runtime_volume_market = accumulate_trade_volume/yestoday_trade_volum
+            if id not in self._no_seed_stock_id and runtime_price_market>=self._price_market and runtime_volume_market>=self._volume_market:
                 self._no_seed_stock_id.append(id)
-                self._send_message = self._send_message + "<code>" + id + " : " + name + "</code>\n"
+                self.__send_message_list.append([id,name,runtime_price_market,runtime_volume_market])
+                # self._send_message = self._send_message + "<code>{} : {} 漲幅:{},交易量{}</code>\n".format(id,name,"{:.2%}".format(runtime_price_market-1),"{:.0%}".format(runtime_volume_market))
         except Exception as e:
             print("An exception occurred id : " + id)
             error_class = e.__class__.__name__ #取得錯誤類型

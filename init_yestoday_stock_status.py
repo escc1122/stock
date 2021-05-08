@@ -20,7 +20,7 @@ import time
 
 stock_array = customer_db.get_stock_ids()
 
-newarr = np.array_split(stock_array, int(len(stock_array)/100))
+newarr = np.array_split(stock_array, int(len(stock_array)/150)+1)
 
 # print (newarr[0].tolist())
 
