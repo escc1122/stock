@@ -67,7 +67,13 @@ while 1:
     
     for ids in newarr:
         send_message=''
-        stocks = twstock.realtime.get(ids.tolist())
+        stocks = {}
+        try:
+            stocks = twstock.realtime.get(ids.tolist())
+        except:
+            stocks['success'] = False
+            print("twstock.realtime.get error")
+        # stocks = twstock.realtime.get(ids.tolist())
         if stocks['success'] == True:
             localtime  = time.localtime()
             result = time.strftime("%Y-%m-%d %I:%M:%S %p", localtime)
