@@ -38,16 +38,23 @@ yestoday_stock_status = customer_db.get_yestoday_stock_status()
 
 yestoday_stock_status_keys = yestoday_stock_status.keys()
 
+securities_investment_buy_three_day_dict = customer_db.get_securities_investment_buy_three_day_dict()
+
 count=0
 
 # 條件 start
 conditions = condition.Conditions()
 # 盤中漲幅超過 3% , 交易量超過 1.5 倍
 condtion1 = condition.PriceAndVolumeCondition(yestoday_stock_status,1.03,1.5)
+# condtion1 = condition.PriceAndVolumeCondition(yestoday_stock_status,1.00,0.5)
 # 盤中漲幅超過 3% , 交易量超過 2 倍
 condtion2 = condition.PriceAndVolumeCondition(yestoday_stock_status,1.03,2)
+
+condtion3 = condition.SecuritiesInvestmentCondition(securities_investment_buy_three_day_dict,yestoday_stock_status,1.03)
+
 conditions.addCondition(condtion1)
 conditions.addCondition(condtion2)
+conditions.addCondition(condtion3)
 
 # 條件 end
 
@@ -66,7 +73,7 @@ while 1:
     newarr = np.array_split(stock_array, int(len(stock_array)/150)+1)
     
     for ids in newarr:
-        print(ids)
+        # print(ids)
         send_message=''
         stocks = {}
         try:
