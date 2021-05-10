@@ -22,12 +22,22 @@ def send_msg(send_message):
         url = config.TELEGRAM_BOT_URL+"sendMessage"
         my_params = {'chat_id': config.TELEGRAM_BOT_CHAT_ID, 
                           'parse_mode': 'html',
-                          'text':send_message
+                          'text': send_message
                           }
             
         r = requests.get(url,params =my_params)
-        # data = r.json()
         
+# 沒空弄 先這樣寫
+def send_securities_investment_msg(send_message):
+    print(send_message)
+    if not send_message=='':            
+        url = config.TELEGRAM_BOT_URL+"sendMessage"
+        my_params = {'chat_id': config.TELEGRAM_BOT_SECURITIES_INVESTMENT_CHAT_ID, 
+                          'parse_mode': 'html',
+                          'text': send_message
+                          }
+            
+        r = requests.get(url,params =my_params)        
 
 proxies = config.PROXIES
 
@@ -45,14 +55,14 @@ count=0
 # 條件 start
 conditions = condition.Conditions()
 # 盤中漲幅超過 3% , 交易量超過 1.5 倍
-condtion1 = condition.PriceAndVolumeCondition(yestoday_stock_status,1.03,1.5)
+# condtion1 = condition.PriceAndVolumeCondition(yestoday_stock_status,securities_investment_buy_three_day_dict,1.03,1.5)
 # condtion1 = condition.PriceAndVolumeCondition(yestoday_stock_status,1.00,0.5)
 # 盤中漲幅超過 3% , 交易量超過 2 倍
-condtion2 = condition.PriceAndVolumeCondition(yestoday_stock_status,1.03,2)
+condtion2 = condition.PriceAndVolumeCondition(yestoday_stock_status,securities_investment_buy_three_day_dict,1.03,2)
 
-condtion3 = condition.SecuritiesInvestmentCondition(securities_investment_buy_three_day_dict,yestoday_stock_status,1.03)
+condtion3 = condition.SecuritiesInvestmentCondition(yestoday_stock_status,securities_investment_buy_three_day_dict,1.03)
 
-conditions.addCondition(condtion1)
+# conditions.addCondition(condtion1)
 conditions.addCondition(condtion2)
 conditions.addCondition(condtion3)
 
@@ -121,8 +131,15 @@ while 1:
         # print("al_test" + condtion2.get_send_message())
         
         # send_message = condtion1.get_send_message() + condtion2.get_send_message()
-        for one_condition in conditions.conditions:
-            send_msg(one_condition.get_send_message())
+        
+        
+        # 沒空弄 先暫時改成寫死
+        # for one_condition in conditions.conditions:
+        #     send_msg(one_condition.get_send_message())
+        send_msg(conditions.conditions[0].get_send_message())
+        send_securities_investment_msg(conditions.conditions[1].get_send_message())
+        
+        
         # send_msg(send_message)
         # condtion1.clean_message()
         # condtion2.clean_message()

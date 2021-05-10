@@ -145,11 +145,12 @@ class PriceAndVolumeCondition(Condition):
     #     self._volume_market = 0
     #     self.__send_message_list = []
         
-    def __init__(self,yestoday_stock_status,price_market=1.03,volume_market=2):
+    def __init__(self,yestoday_stock_status,securities_investment_buy_three_day_dict,price_market=1.03,volume_market=2):
         super().__init__(yestoday_stock_status)
         self._price_market = price_market
         self._volume_market = volume_market
         self.__send_message_list = []
+        self.__securities_investment_keys = securities_investment_buy_three_day_dict.keys()
         self._send_message_title = "<code>漲幅超過 {} ,交易量超過 {}</code>\n".format("{:.2%}".format(price_market-1), "{:.0%}".format(volume_market))
 
     def __sort():
@@ -160,7 +161,10 @@ class PriceAndVolumeCondition(Condition):
         msg = ''
         self.__send_message_list.sort(key=lambda one_data: one_data[3],reverse=True)
         for one_data in self.__send_message_list:
-            send_message = send_message + "<code>{} :{},交易量:{},漲幅{}</code>\n".format(one_data[0],one_data[1],"{:.0%}".format(one_data[3]),"{:.2%}".format(one_data[2]-1))
+            id = one_data[0]
+            send_message = send_message + "<code>{} :{},交易量:{},漲幅{}</code>\n".format(id,one_data[1],"{:.0%}".format(one_data[3]),"{:.2%}".format(one_data[2]-1))
+            if id in self.__securities_investment_keys:
+                send_message = send_message + "<code>===={}投信連三買=====</code>\n".format(id)
         if not send_message=='':
             msg = self._send_message_title + send_message  
         return msg
@@ -212,7 +216,7 @@ class SecuritiesInvestmentCondition(Condition):
     #     self._price_market = 0
     #     self.__send_message_list = []
         
-    def __init__(self,securities_investment_buy_three_day_dict,yestoday_stock_status,price_market=1.03):
+    def __init__(self,yestoday_stock_status,securities_investment_buy_three_day_dict,price_market=1.03):
         super().__init__(yestoday_stock_status)
         self.__securities_investment_buy_three_day_dict = securities_investment_buy_three_day_dict
         self.__securities_investment_keys = securities_investment_buy_three_day_dict.keys()
@@ -258,7 +262,6 @@ class SecuritiesInvestmentCondition(Condition):
             if id not in self._no_seed_stock_id and id in self.__securities_investment_keys and runtime_price_market>=self._price_market:
                 self._no_seed_stock_id.append(id)
                 self.__send_message_list.append([id,name,runtime_price_market,self.__securities_investment_buy_three_day_dict[id]])
-                # self._send_message = self._send_message + "<code>{} : {} 漲幅:{},交易量{}</code>\n".format(id,name,"{:.2%}".format(runtime_price_market-1),"{:.0%}".format(runtime_volume_market))
         except Exception as e:
             print("An exception occurred id : " + id)
             error_class = e.__class__.__name__ #取得錯誤類型
