@@ -17,12 +17,14 @@ class Runtime_stock_data():
         # 股票id
         self._stock_id = id
         self._name = ''
+        self.__latest_trade_price = int(0)
         try:
             if id in stocks:
                 realtime = stocks[id]['realtime']
                 self._name = stocks[id]['info']['name']
                 self._accumulate_trade_volume = int(realtime['accumulate_trade_volume'])
                 self._high = float(realtime['high'])
+                self.__latest_trade_price = float(realtime['latest_trade_price'])
             else:
                 print("id no found id : {}",id)
         except:
@@ -57,7 +59,14 @@ class Runtime_stock_data():
         return self._name
     @name.setter
     def name(self, new_data):
-        self._name = new_data 
+        self._name = new_data
+        
+    @property
+    def latest_trade_price(self):
+        return self.__latest_trade_price
+    @latest_trade_price.setter
+    def latest_trade_price(self, new_data):
+        self.__latest_trade_price = new_data
         
         
 
@@ -130,11 +139,11 @@ class Condition(ICondition):
         
         
 class PriceAndVolumeCondition(Condition):
-    def __init__(self,yestoday_stock_status):
-        super().__init__(yestoday_stock_status)
-        self._price_market = 0
-        self._volume_market = 0
-        self.__send_message_list = []
+    # def __init__(self,yestoday_stock_status):
+    #     super().__init__(yestoday_stock_status)
+    #     self._price_market = 0
+    #     self._volume_market = 0
+    #     self.__send_message_list = []
         
     def __init__(self,yestoday_stock_status,price_market=1.03,volume_market=2):
         super().__init__(yestoday_stock_status)
@@ -172,11 +181,11 @@ class PriceAndVolumeCondition(Condition):
         try:
             id = runtime_stock_data.stock_id
             accumulate_trade_volume = runtime_stock_data.accumulate_trade_volume
-            high = runtime_stock_data.high
+            latest_trade_price = runtime_stock_data.latest_trade_price
             name = runtime_stock_data.name
             yestoday_trade_volum = int(self._yestoday_stock_status[id]['trade_volume'])
             yestoday_close_price = float(self._yestoday_stock_status[id]['close_price'])
-            runtime_price_market = high/yestoday_close_price
+            runtime_price_market = latest_trade_price/yestoday_close_price
             runtime_volume_market = accumulate_trade_volume/yestoday_trade_volum
             if id not in self._no_seed_stock_id and runtime_price_market>=self._price_market and runtime_volume_market>=self._volume_market:
                 self._no_seed_stock_id.append(id)
@@ -196,12 +205,12 @@ class PriceAndVolumeCondition(Condition):
         
 # 投信連買3天   
 class SecuritiesInvestmentCondition(Condition):
-    def __init__(self,securities_investment_buy_three_day_dict,yestoday_stock_status):
-        super().__init__(yestoday_stock_status)
-        self.__securities_investment_buy_three_day_dict = securities_investment_buy_three_day_dict
-        self.__securities_investment_keys = securities_investment_buy_three_day_dict.keys()
-        self._price_market = 0
-        self.__send_message_list = []
+    # def __init__(self,securities_investment_buy_three_day_dict,yestoday_stock_status):
+    #     super().__init__(yestoday_stock_status)
+    #     self.__securities_investment_buy_three_day_dict = securities_investment_buy_three_day_dict
+    #     self.__securities_investment_keys = securities_investment_buy_three_day_dict.keys()
+    #     self._price_market = 0
+    #     self.__send_message_list = []
         
     def __init__(self,securities_investment_buy_three_day_dict,yestoday_stock_status,price_market=1.03):
         super().__init__(yestoday_stock_status)
@@ -240,11 +249,11 @@ class SecuritiesInvestmentCondition(Condition):
         try:
             id = runtime_stock_data.stock_id
             # accumulate_trade_volume = runtime_stock_data.accumulate_trade_volume
-            high = runtime_stock_data.high
+            latest_trade_price = runtime_stock_data.latest_trade_price
             name = runtime_stock_data.name
             # yestoday_trade_volum = int(self._yestoday_stock_status[id]['trade_volume'])
             yestoday_close_price = float(self._yestoday_stock_status[id]['close_price'])
-            runtime_price_market = high/yestoday_close_price
+            runtime_price_market = latest_trade_price/yestoday_close_price
             # runtime_volume_market = accumulate_trade_volume/yestoday_trade_volum
             if id not in self._no_seed_stock_id and id in self.__securities_investment_keys and runtime_price_market>=self._price_market:
                 self._no_seed_stock_id.append(id)
