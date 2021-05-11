@@ -42,7 +42,6 @@ def insertTable(ids):
         customer_db.get_connect()
         conn = customer_db.get_connect()
         cursor = conn.cursor()
-        
         for id in ids:
             if id in stocks:
                 realtime = stocks[id]['realtime']
@@ -61,9 +60,18 @@ def insertTable(ids):
         print("re")
         time.sleep(20)
         insertTable(ids)
-    
 
-
+def cleanTable():
+    print("cleanTable")
+    customer_db.get_connect()
+    conn = customer_db.get_connect()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM public.yestoday_stock_status")
+    conn.commit()
+    cursor.close()
+    conn.close()
+        
+cleanTable()
 for ids in newarr:
     insertTable(ids)
     time.sleep(20)

@@ -17,14 +17,21 @@ class Runtime_stock_data():
         # 股票id
         self._stock_id = id
         self._name = ''
-        self.__latest_trade_price = int(0)
+        self.__latest_trade_price = float(0)
+        self.__trade_price = float(0)
         try:
             if id in stocks:
                 realtime = stocks[id]['realtime']
+                best_bid_price = realtime['best_bid_price']
+                best_ask_price = realtime['best_ask_price']
                 self._name = stocks[id]['info']['name']
                 self._accumulate_trade_volume = int(realtime['accumulate_trade_volume'])
                 self._high = float(realtime['high'])
                 self.__latest_trade_price = float(realtime['latest_trade_price'])
+                if best_bid_price[0] == '-':
+                    self.__trade_price = float(best_ask_price[0])
+                else:
+                    self.__trade_price = float(best_bid_price[0])
             else:
                 print("id no found id : {}",id)
         except:
@@ -67,7 +74,13 @@ class Runtime_stock_data():
     @latest_trade_price.setter
     def latest_trade_price(self, new_data):
         self.__latest_trade_price = new_data
-        
+
+    @property
+    def trade_price(self):
+        return self.__trade_price
+    @trade_price.setter
+    def trade_price(self, new_data):
+        self.__trade_price = new_data        
         
 
 class ICondition(abc.ABC):
@@ -185,18 +198,18 @@ class PriceAndVolumeCondition(Condition):
         try:
             id = runtime_stock_data.stock_id
             accumulate_trade_volume = runtime_stock_data.accumulate_trade_volume
-            high = runtime_stock_data.high
+            trade_price = runtime_stock_data.trade_price
             name = runtime_stock_data.name
             yestoday_trade_volum = int(self._yestoday_stock_status[id]['trade_volume'])
             yestoday_close_price = float(self._yestoday_stock_status[id]['close_price'])
-            runtime_price_market = high/yestoday_close_price
+            runtime_price_market = trade_price/yestoday_close_price
             runtime_volume_market = accumulate_trade_volume/yestoday_trade_volum
             if id not in self._no_seed_stock_id and runtime_price_market>=self._price_market and runtime_volume_market>=self._volume_market:
                 self._no_seed_stock_id.append(id)
                 self.__send_message_list.append([id,name,runtime_price_market,runtime_volume_market])
                 # self._send_message = self._send_message + "<code>{} : {} 漲幅:{},交易量{}</code>\n".format(id,name,"{:.2%}".format(runtime_price_market-1),"{:.0%}".format(runtime_volume_market))
         except Exception as e:
-            print("An exception occurred id : " + id)
+            print("check error occurred id : " + id)
             error_class = e.__class__.__name__ #取得錯誤類型
             detail = e.args[0] #取得詳細內容
             cl, exc, tb = sys.exc_info() #取得Call Stack
@@ -253,17 +266,17 @@ class SecuritiesInvestmentCondition(Condition):
         try:
             id = runtime_stock_data.stock_id
             # accumulate_trade_volume = runtime_stock_data.accumulate_trade_volume
-            high = runtime_stock_data.high
+            trade_price = runtime_stock_data.trade_price
             name = runtime_stock_data.name
             # yestoday_trade_volum = int(self._yestoday_stock_status[id]['trade_volume'])
             yestoday_close_price = float(self._yestoday_stock_status[id]['close_price'])
-            runtime_price_market = high/yestoday_close_price
+            runtime_price_market = trade_price/yestoday_close_price
             # runtime_volume_market = accumulate_trade_volume/yestoday_trade_volum
             if id not in self._no_seed_stock_id and id in self.__securities_investment_keys and runtime_price_market>=self._price_market:
                 self._no_seed_stock_id.append(id)
                 self.__send_message_list.append([id,name,runtime_price_market,self.__securities_investment_buy_three_day_dict[id]])
         except Exception as e:
-            print("An exception occurred id : " + id)
+            print("check error occurred id : " + id)
             error_class = e.__class__.__name__ #取得錯誤類型
             detail = e.args[0] #取得詳細內容
             cl, exc, tb = sys.exc_info() #取得Call Stack
