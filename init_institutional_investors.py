@@ -9,7 +9,7 @@ from twstock.institutional_investors import InstitutionalInvestors
 import customer_db
 
 
-institutional_investors = InstitutionalInvestors().get(2021,5,4)
+institutional_investors = InstitutionalInvestors().get(2021,5,10)
 
 if institutional_investors.success==True:
     customer_db.get_connect()

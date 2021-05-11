@@ -185,11 +185,11 @@ class PriceAndVolumeCondition(Condition):
         try:
             id = runtime_stock_data.stock_id
             accumulate_trade_volume = runtime_stock_data.accumulate_trade_volume
-            latest_trade_price = runtime_stock_data.latest_trade_price
+            high = runtime_stock_data.high
             name = runtime_stock_data.name
             yestoday_trade_volum = int(self._yestoday_stock_status[id]['trade_volume'])
             yestoday_close_price = float(self._yestoday_stock_status[id]['close_price'])
-            runtime_price_market = latest_trade_price/yestoday_close_price
+            runtime_price_market = high/yestoday_close_price
             runtime_volume_market = accumulate_trade_volume/yestoday_trade_volum
             if id not in self._no_seed_stock_id and runtime_price_market>=self._price_market and runtime_volume_market>=self._volume_market:
                 self._no_seed_stock_id.append(id)
@@ -253,11 +253,11 @@ class SecuritiesInvestmentCondition(Condition):
         try:
             id = runtime_stock_data.stock_id
             # accumulate_trade_volume = runtime_stock_data.accumulate_trade_volume
-            latest_trade_price = runtime_stock_data.latest_trade_price
+            high = runtime_stock_data.high
             name = runtime_stock_data.name
             # yestoday_trade_volum = int(self._yestoday_stock_status[id]['trade_volume'])
             yestoday_close_price = float(self._yestoday_stock_status[id]['close_price'])
-            runtime_price_market = latest_trade_price/yestoday_close_price
+            runtime_price_market = high/yestoday_close_price
             # runtime_volume_market = accumulate_trade_volume/yestoday_trade_volum
             if id not in self._no_seed_stock_id and id in self.__securities_investment_keys and runtime_price_market>=self._price_market:
                 self._no_seed_stock_id.append(id)
