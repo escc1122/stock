@@ -18,26 +18,28 @@ import condition
 
 def send_msg(send_message):
     print(send_message)
-    if not send_message=='':            
-        url = config.TELEGRAM_BOT_URL+"sendMessage"
-        my_params = {'chat_id': config.TELEGRAM_BOT_CHAT_ID, 
-                          'parse_mode': 'html',
-                          'text': send_message
-                          }
-            
-        r = requests.get(url,params =my_params)
-        
+    if not send_message == '':
+        url = config.TELEGRAM_BOT_URL + "sendMessage"
+        my_params = {'chat_id': config.TELEGRAM_BOT_CHAT_ID,
+                     'parse_mode': 'html',
+                     'text': send_message
+                     }
+
+        r = requests.get(url, params=my_params)
+
+
 # 沒空弄 先這樣寫
 def send_securities_investment_msg(send_message):
     print(send_message)
-    if not send_message=='':            
-        url = config.TELEGRAM_BOT_URL+"sendMessage"
-        my_params = {'chat_id': config.TELEGRAM_BOT_SECURITIES_INVESTMENT_CHAT_ID, 
-                          'parse_mode': 'html',
-                          'text': send_message
-                          }
-            
-        r = requests.get(url,params =my_params)        
+    if not send_message == '':
+        url = config.TELEGRAM_BOT_URL + "sendMessage"
+        my_params = {'chat_id': config.TELEGRAM_BOT_SECURITIES_INVESTMENT_CHAT_ID,
+                     'parse_mode': 'html',
+                     'text': send_message
+                     }
+
+        r = requests.get(url, params=my_params)
+
 
 proxies = config.PROXIES
 
@@ -50,7 +52,7 @@ yestoday_stock_status_keys = yestoday_stock_status.keys()
 
 securities_investment_buy_three_day_dict = customer_db.get_securities_investment_buy_three_day_dict()
 
-count=0
+count = 0
 
 # 條件 start
 conditions = condition.Conditions()
@@ -58,9 +60,10 @@ conditions = condition.Conditions()
 # condtion1 = condition.PriceAndVolumeCondition(yestoday_stock_status,securities_investment_buy_three_day_dict,1.03,1.5)
 # condtion1 = condition.PriceAndVolumeCondition(yestoday_stock_status,1.00,0.5)
 # 盤中漲幅超過 3% , 交易量超過 2 倍
-condtion2 = condition.PriceAndVolumeCondition(yestoday_stock_status,securities_investment_buy_three_day_dict,1.03,2)
+condtion2 = condition.PriceAndVolumeCondition(yestoday_stock_status, securities_investment_buy_three_day_dict, 1.03, 2)
 
-condtion3 = condition.SecuritiesInvestmentCondition(yestoday_stock_status,securities_investment_buy_three_day_dict,1.03)
+condtion3 = condition.SecuritiesInvestmentCondition(yestoday_stock_status, securities_investment_buy_three_day_dict,
+                                                    1.03)
 
 # conditions.addCondition(condtion1)
 conditions.addCondition(condtion2)
@@ -71,20 +74,19 @@ conditions.addCondition(condtion3)
 
 while 1:
     print(count)
-    count = count+1
+    count = count + 1
     stock_array = []
-    send_stock_array =[]
+    send_stock_array = []
     for stock_id in yestoday_stock_status_keys:
         stock_array.append(stock_id)
-        
-        
+
     # test
     # stock_array = ["2615","2537","3059","4952"]
-    newarr = np.array_split(stock_array, int(len(stock_array)/150)+1)
-    
+    newarr = np.array_split(stock_array, int(len(stock_array) / 150) + 1)
+
     for ids in newarr:
         # print(ids)
-        send_message=''
+        send_message = ''
         stocks = {}
         try:
             stocks = twstock.realtime.get(ids.tolist())
@@ -93,17 +95,16 @@ while 1:
             print("twstock.realtime.get error")
         # stocks = twstock.realtime.get(ids.tolist())
         if stocks['success'] == True:
-            localtime  = time.localtime()
+            localtime = time.localtime()
             result = time.strftime("%Y-%m-%d %I:%M:%S %p", localtime)
             print('True ' + result)
             for id in ids:
                 try:
-                    runtime_stock_data = condition.Runtime_stock_data(id,stocks)
+                    runtime_stock_data = condition.RuntimeStockData(id, stocks)
                     # condtion1.check(runtime_stock_data)
                     # condtion2.check(runtime_stock_data)
                     conditions.check(runtime_stock_data)
-                    
-                    
+
                     # realtime = stocks[id]['realtime']
                     # name = stocks[id]['info']['name']
                     # accumulate_trade_volume = int(realtime['accumulate_trade_volume'])
@@ -115,41 +116,37 @@ while 1:
                     #     send_message = send_message + "<code>" + id + " : " + name + "</code>\n"
                 except Exception as e:
                     print("An exception occurred id : " + id)
-                    error_class = e.__class__.__name__ #取得錯誤類型
-                    detail = e.args[0] #取得詳細內容
-                    cl, exc, tb = sys.exc_info() #取得Call Stack
-                    lastCallStack = traceback.extract_tb(tb)[-1] #取得Call Stack的最後一筆資料
-                    fileName = lastCallStack[0] #取得發生的檔案名稱
-                    lineNum = lastCallStack[1] #取得發生的行號
-                    funcName = lastCallStack[2] #取得發生的函數名稱
-                    errMsg = "File \"{}\", line {}, in {}: [{}] {}".format(fileName, lineNum, funcName, error_class, detail)
+                    error_class = e.__class__.__name__  # 取得錯誤類型
+                    detail = e.args[0]  # 取得詳細內容
+                    cl, exc, tb = sys.exc_info()  # 取得Call Stack
+                    lastCallStack = traceback.extract_tb(tb)[-1]  # 取得Call Stack的最後一筆資料
+                    fileName = lastCallStack[0]  # 取得發生的檔案名稱
+                    lineNum = lastCallStack[1]  # 取得發生的行號
+                    funcName = lastCallStack[2]  # 取得發生的函數名稱
+                    errMsg = "File \"{}\", line {}, in {}: [{}] {}".format(fileName, lineNum, funcName, error_class,
+                                                                           detail)
                     print(errMsg)
         else:
             print('http error')
-            
+
         # print("al_test" + condtion1.get_send_message())
         # print("al_test" + condtion2.get_send_message())
-        
+
         # send_message = condtion1.get_send_message() + condtion2.get_send_message()
-        
-        
+
         # 沒空弄 先暫時改成寫死
         # for one_condition in conditions.conditions:
         #     send_msg(one_condition.get_send_message())
         send_msg(conditions.conditions[0].get_send_message())
         send_securities_investment_msg(conditions.conditions[1].get_send_message())
-        
-        
+
         # send_msg(send_message)
         # condtion1.clean_message()
         # condtion2.clean_message()
         conditions.clean_message()
         time.sleep(20)
-    
-    
 
     # if len(send_stock_array)>0:
     #     for key in send_stock_array:
     #         del yestoday_stock_status[key]
     #         print(key)
-        
