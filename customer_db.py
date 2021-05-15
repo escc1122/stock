@@ -21,7 +21,7 @@ cursor = conn.cursor()
 
 cursor.execute("CREATE TABLE IF NOT EXISTS stocks_classification (classification_id VARCHAR(10) PRIMARY KEY, classification_name VARCHAR(50));")
 cursor.execute("CREATE TABLE IF NOT EXISTS stocks (stock_id VARCHAR(10),classification_id VARCHAR(10) , stock_name VARCHAR(50),PRIMARY KEY (stock_id, classification_id));")
-cursor.execute("CREATE TABLE IF NOT EXISTS yestoday_stock_status (stock_id VARCHAR(10) PRIMARY KEY, trade_volume bigint, close_price real);")
+cursor.execute("CREATE TABLE IF NOT EXISTS yestoday_stock_status (stock_id VARCHAR(10) PRIMARY KEY, trade_volume bigint, close_price real, open_price real);")
 cursor.execute("CREATE TABLE IF NOT EXISTS public.twse_institutional_investors(stock_date character varying(8) NOT NULL,stock_id character varying(10) NOT NULL,area_investors_buy bigint,area_investors_sell bigint,area_investors_difference bigint,foreign_dealers_buy bigint,foreign_dealers_sell bigint,foreign_dealers_difference bigint,securities_investment_buy bigint,securities_investment_sell bigint,securities_investment_difference bigint,dealers_difference bigint,dealers_difference_buy bigint,dealers_difference_sell bigint,dealers_difference_difference bigint,dealers_hedge_buy bigint,dealers_hedge_sell bigint,dealers_hedge_difference bigint,total_difference bigint,PRIMARY KEY (stock_date, stock_id));")
 
 

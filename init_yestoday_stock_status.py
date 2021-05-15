@@ -46,13 +46,14 @@ def insertTable(ids):
             if id in stocks:
                 realtime = stocks[id]['realtime']
                 latest_trade_price = realtime['latest_trade_price']
+                open_price = realtime['open']
                 if latest_trade_price == '-':
                     latest_trade_price = '-1'
-                cursor.execute("INSERT INTO yestoday_stock_status (stock_id, trade_volume, close_price) VALUES (%s, %s, %s) on conflict (stock_id) do update set trade_volume=%s;", (id,realtime['accumulate_trade_volume'],latest_trade_price,realtime['accumulate_trade_volume']))
+                cursor.execute("INSERT INTO yestoday_stock_status (stock_id, trade_volume, close_price, open_price) VALUES (%s, %s, %s, %s) on conflict (stock_id) do update set trade_volume=%s;", (id,realtime['accumulate_trade_volume'],latest_trade_price,open_price,realtime['accumulate_trade_volume']))
             else:
                 print("id no found " + id)
                 no_found_id.append(id)
-                cursor.execute("INSERT INTO yestoday_stock_status (stock_id, trade_volume, close_price) VALUES (%s, %s, %s) on conflict (stock_id) do update set trade_volume=0;", (id,'-1','-1'))
+                cursor.execute("INSERT INTO yestoday_stock_status (stock_id, trade_volume, close_price, open_price) VALUES (%s, %s, %s, %s) on conflict (stock_id) do update set trade_volume=0;", (id,'-1','-1','-1'))
         conn.commit()
         cursor.close()
         conn.close()
