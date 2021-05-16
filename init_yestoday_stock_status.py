@@ -38,6 +38,8 @@ def insert_table(ids):
                 realtime = stocks[id]['realtime']
                 latest_trade_price = realtime['latest_trade_price']
                 open_price = realtime['open']
+                if open_price == '-':
+                    open_price = '-1'
                 if latest_trade_price == '-':
                     latest_trade_price = '-1'
                 cursor.execute(
