@@ -62,9 +62,7 @@ def get_yestoday_stock_status():
 
     # Print all rows
     for row in rows:
-        t = {}
-        t['trade_volume'] = row[1]
-        t['close_price'] = row[2]
+        t = {'trade_volume': row[1], 'close_price': row[2]}
         return_map[row[0]] = t
     return return_map
 
