@@ -43,14 +43,16 @@ def insert_table(ids):
                 if latest_trade_price == '-':
                     latest_trade_price = '-1'
                 cursor.execute(
-                    "INSERT INTO yestoday_stock_status (stock_id, trade_volume, close_price, open_price) VALUES (%s, %s, %s, %s) on conflict (stock_id) do update set trade_volume=%s;",
+                    "INSERT INTO yestoday_stock_status (stock_id, trade_volume, close_price, open_price) VALUES (%s, "
+                    "%s, %s, %s) on conflict (stock_id) do update set trade_volume=%s;",
                     (id, realtime['accumulate_trade_volume'], latest_trade_price, open_price,
                      realtime['accumulate_trade_volume']))
             else:
                 print("id no found " + id)
                 no_found_id.append(id)
                 cursor.execute(
-                    "INSERT INTO yestoday_stock_status (stock_id, trade_volume, close_price, open_price) VALUES (%s, %s, %s, %s) on conflict (stock_id) do update set trade_volume=0;",
+                    "INSERT INTO yestoday_stock_status (stock_id, trade_volume, close_price, open_price) VALUES (%s, "
+                    "%s, %s, %s) on conflict (stock_id) do update set trade_volume=0;",
                     (id, '-1', '-1', '-1'))
         conn.commit()
         cursor.close()

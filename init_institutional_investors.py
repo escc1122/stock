@@ -10,7 +10,7 @@ import customer_db
 
 
 def main():
-    institutional_investors = InstitutionalInvestors().get(2021, 5, 14)
+    institutional_investors = InstitutionalInvestors().get(2021, 6, 3)
     if institutional_investors.success:
         customer_db.get_connect()
         conn = customer_db.get_connect()

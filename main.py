@@ -10,38 +10,40 @@ import numpy as np
 import time
 import requests
 from twstock.proxy import RoundRobinProxiesProvider
-import config
+import config.proxies_config as proxies_config
 import sys
 import traceback
 import condition
 
 
-def send_msg(send_message):
-    print(send_message)
-    if not send_message == '':
-        url = config.TELEGRAM_BOT_URL + "sendMessage"
-        my_params = {'chat_id': config.TELEGRAM_BOT_CHAT_ID,
-                     'parse_mode': 'html',
-                     'text': send_message
-                     }
-
-        r = requests.get(url, params=my_params)
 
 
-# 沒空弄 先這樣寫
-def send_securities_investment_msg(send_message):
-    print(send_message)
-    if not send_message == '':
-        url = config.TELEGRAM_BOT_URL + "sendMessage"
-        my_params = {'chat_id': config.TELEGRAM_BOT_SECURITIES_INVESTMENT_CHAT_ID,
-                     'parse_mode': 'html',
-                     'text': send_message
-                     }
+# def send_msg(send_message):
+#     print(send_message)
+#     if not send_message == '':
+#         url = config.TELEGRAM_BOT_URL + "sendMessage"
+#         my_params = {'chat_id': config.TELEGRAM_BOT_CHAT_ID,
+#                      'parse_mode': 'html',
+#                      'text': send_message
+#                      }
+#
+#         r = requests.get(url, params=my_params)
 
-        r = requests.get(url, params=my_params)
+
+# # 沒空弄 先這樣寫
+# def send_securities_investment_msg(send_message):
+#     print(send_message)
+#     if not send_message == '':
+#         url = config.TELEGRAM_BOT_URL + "sendMessage"
+#         my_params = {'chat_id': config.TELEGRAM_BOT_SECURITIES_INVESTMENT_CHAT_ID,
+#                      'parse_mode': 'html',
+#                      'text': send_message
+#                      }
+#
+#         r = requests.get(url, params=my_params)
 
 
-proxies = config.PROXIES
+proxies = proxies_config.PROXIES
 
 rrpr = RoundRobinProxiesProvider(proxies)
 twstock.proxy.configure_proxy_provider(rrpr)
@@ -65,9 +67,9 @@ condtion2 = condition.PriceAndVolumeCondition(yestoday_stock_status, securities_
 condtion3 = condition.SecuritiesInvestmentCondition(yestoday_stock_status, securities_investment_buy_three_day_dict,
                                                     1.03)
 
-# conditions.addCondition(condtion1)
-conditions.addCondition(condtion2)
-conditions.addCondition(condtion3)
+# conditions.add_condition(condtion1)
+# conditions.add_condition(condtion2)
+conditions.add_condition(condtion3)
 
 # 條件 end
 
@@ -94,7 +96,7 @@ while 1:
             stocks['success'] = False
             print("twstock.realtime.get error")
         # stocks = twstock.realtime.get(ids.tolist())
-        if stocks['success'] == True:
+        if stocks['success']:
             localtime = time.localtime()
             result = time.strftime("%Y-%m-%d %I:%M:%S %p", localtime)
             print('True ' + result)
@@ -137,12 +139,13 @@ while 1:
         # 沒空弄 先暫時改成寫死
         # for one_condition in conditions.conditions:
         #     send_msg(one_condition.get_send_message())
-        send_msg(conditions.conditions[0].get_send_message())
-        send_securities_investment_msg(conditions.conditions[1].get_send_message())
+        # send_msg(conditions.conditions[0].get_send_message())
+        # send_securities_investment_msg(conditions.conditions[1].get_send_message())
 
         # send_msg(send_message)
         # condtion1.clean_message()
         # condtion2.clean_message()
+        conditions.send_message()
         conditions.clean_message()
         time.sleep(20)
 

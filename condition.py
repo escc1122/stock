@@ -7,6 +7,7 @@ Created on Sat May  8 19:06:27 2021
 import sys
 import traceback
 import abc
+from message import MessageFactory
 
 
 class RuntimeStockData():
@@ -94,9 +95,9 @@ class ICondition(abc.ABC):
     def check(self, runtime_stock_data):
         pass
 
-    # @abc.abstractmethod
-    # def get_send_message(self):
-    #     pass
+    @abc.abstractmethod
+    def send_message(self):
+        pass
 
     @abc.abstractmethod
     def clean_message(self):
@@ -107,7 +108,7 @@ class Conditions(ICondition):
     def __init__(self):
         self.__conditions = []
 
-    def addCondition(self, condition):
+    def add_condition(self, condition):
         self.__conditions.append(condition)
 
     def check(self, runtime_stock_data):
@@ -118,6 +119,10 @@ class Conditions(ICondition):
         for condition in self.__conditions:
             condition.clean_message()
 
+    def send_message(self):
+        for condition in self.__conditions:
+            condition.send_message()
+
     @property
     def conditions(self):
         return self.__conditions
@@ -125,6 +130,7 @@ class Conditions(ICondition):
 
 class Condition(ICondition):
     def __init__(self, yestoday_stock_status):
+        self._bot_instance = MessageFactory.get_instance(MessageFactory.TELEGRAM_BOT_CHAT_ID)
         # 昨日收盤資料
         self._yestoday_stock_status = yestoday_stock_status
         self._no_seed_stock_id = []
@@ -134,21 +140,22 @@ class Condition(ICondition):
     def check(self, runtime_stock_data):
         pass
 
-    def get_send_message(self):
+    def send_message(self):
         msg = ''
-        # print("_send_message_title : " + self._send_message_title)
         if not self._send_message == '':
             msg = self._send_message_title + self._send_message
-        return msg
+        self._bot_instance.send_msg(msg)
 
     def clean_message(self):
         self._send_message = ''
 
 
+# 跟價錢和交易量有關的條件
 class PriceAndVolumeCondition(Condition):
     def __init__(self, yestoday_stock_status, securities_investment_buy_three_day_dict, price_market=1.03,
                  volume_market=2):
         super().__init__(yestoday_stock_status)
+        self._bot_instance = MessageFactory.get_instance(MessageFactory.TELEGRAM_BOT_CHAT_ID)
         self._price_market = price_market
         self._volume_market = volume_market
         self.__send_message_list = []
@@ -172,7 +179,7 @@ class PriceAndVolumeCondition(Condition):
                 send_message = send_message + "<code>===={}投信連三買=====</code>\n".format(id)
         if not send_message == '':
             msg = self._send_message_title + send_message
-        return msg
+        self._bot_instance.send_msg(msg)
 
     def clean_message(self):
         self._send_message = ''
@@ -212,10 +219,11 @@ class PriceAndVolumeCondition(Condition):
             print(errMsg)
 
 
-# 投信連買3天   
+# 跟投信有關的條件 投信連買3天
 class SecuritiesInvestmentCondition(Condition):
     def __init__(self, yestoday_stock_status, securities_investment_buy_three_day_dict, price_market=1.03):
         super().__init__(yestoday_stock_status)
+        self._bot_instance = MessageFactory.get_instance(MessageFactory.TELEGRAM_BOT_SECURITIES_INVESTMENT_CHAT_ID)
         self.__securities_investment_buy_three_day_dict = securities_investment_buy_three_day_dict
         self.__securities_investment_keys = securities_investment_buy_three_day_dict.keys()
         self._price_market = price_market
@@ -225,7 +233,7 @@ class SecuritiesInvestmentCondition(Condition):
     def __sort(self):
         pass
 
-    def get_send_message(self):
+    def send_message(self):
         send_message = ''
         msg = ''
         self.__send_message_list.sort(key=lambda one_data: one_data[3], reverse=True)
@@ -235,7 +243,7 @@ class SecuritiesInvestmentCondition(Condition):
                                                                                        "{:.2%}".format(one_data[2] - 1))
         if not send_message == '':
             msg = self._send_message_title + send_message
-        return msg
+        self._bot_instance.send_msg(msg)
 
     def clean_message(self):
         self._send_message = ''
