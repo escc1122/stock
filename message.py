@@ -10,9 +10,9 @@ class MessageFactory:
     TEST_MODEL = message_config.TEST_MODEL
 
     @staticmethod
-    def get_instance(cls,chat_id):
-        if cls.TEST_MODEL:
-            chat_id = cls.TEST_TELEGRAM_BOT_CHAT_ID
+    def get_instance(chat_id):
+        if MessageFactory.TEST_MODEL:
+            chat_id = MessageFactory.TEST_TELEGRAM_BOT_CHAT_ID
         return Message(chat_id)
 
 
