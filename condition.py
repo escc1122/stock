@@ -166,7 +166,7 @@ class PriceAndVolumeCondition(Condition):
     def __sort(self):
         pass
 
-    def get_send_message(self):
+    def send_message(self):
         send_message = ''
         msg = ''
         self.__send_message_list.sort(key=lambda one_data: one_data[3], reverse=True)
