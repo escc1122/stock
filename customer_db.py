@@ -7,6 +7,7 @@ Created on Sun May  2 14:46:21 2021
 
 import psycopg2
 import config.db_config as config
+from sqlalchemy import create_engine
 
 # Update connection string information
 host = config.DB_HOST
@@ -78,3 +79,14 @@ def get_securities_investment_buy_three_day_dict():
     for row in rows:
         return_map[row[0]] = int(row[1])
     return return_map
+
+
+def get_engine():
+    db_string = "postgresql+psycopg2://{0}:{1}@{2}:5432/{3}".format(user, password, host, dbname)
+    engine = create_engine(db_string,
+                           max_overflow=0,  # 超過連線池大小外最多建立的連線
+                           pool_size=5,  # 連線池大小
+                           pool_timeout=30,  # 池中沒有執行緒最多等待的時間，否則報錯
+                           pool_recycle=-1,  # 多久之後對執行緒池中的執行緒進行一次連線的回收（重置）
+                           echo=True)
+    return engine

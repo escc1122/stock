@@ -10,6 +10,8 @@ pip3 install twstock
 
 pip3 install lxml
 
+pip3 install SQLAlchemy
+
 # 代理
 http://proxy-list.org/english/index.php
 
