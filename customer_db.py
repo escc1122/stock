@@ -81,12 +81,45 @@ def get_securities_investment_buy_three_day_dict():
     return return_map
 
 
-def get_engine():
-    db_string = "postgresql+psycopg2://{0}:{1}@{2}:5432/{3}".format(user, password, host, dbname)
-    engine = create_engine(db_string,
-                           max_overflow=0,  # 超過連線池大小外最多建立的連線
-                           pool_size=5,  # 連線池大小
-                           pool_timeout=30,  # 池中沒有執行緒最多等待的時間，否則報錯
-                           pool_recycle=-1,  # 多久之後對執行緒池中的執行緒進行一次連線的回收（重置）
-                           echo=True)
-    return engine
+# def get_engine():
+#     db_string = "postgresql+psycopg2://{0}:{1}@{2}:5432/{3}".format(user, password, host, dbname)
+#     engine = create_engine(db_string,
+#                            max_overflow=0,  # 超過連線池大小外最多建立的連線
+#                            pool_size=5,  # 連線池大小
+#                            pool_timeout=30,  # 池中沒有執行緒最多等待的時間，否則報錯
+#                            pool_recycle=-1,  # 多久之後對執行緒池中的執行緒進行一次連線的回收（重置）
+#                            echo=True)
+#     return engine
+
+
+
+try:
+    from synchronize import make_synchronized
+except ImportError:
+    def make_synchronized(func):
+        import threading
+        func.__lock__ = threading.Lock()
+
+        # 用裝飾器實現同步鎖
+        def synced_func(*args, **kwargs):
+            with func.__lock__:
+                return func(*args, **kwargs)
+
+        return synced_func
+
+
+class SqlAlchemy:
+    __db_string = "postgresql+psycopg2://{0}:{1}@{2}:5432/{3}".format(user, password, host, dbname)
+    __engine = None
+
+    @classmethod
+    @make_synchronized
+    def get_engine(cls):
+        if cls.__engine is None:
+            cls.__engine = create_engine(cls.__db_string,
+                                         max_overflow=0,  # 超過連線池大小外最多建立的連線
+                                         pool_size=5,  # 連線池大小
+                                         pool_timeout=30,  # 池中沒有執行緒最多等待的時間，否則報錯
+                                         pool_recycle=-1,  # 多久之後對執行緒池中的執行緒進行一次連線的回收（重置）
+                                         echo=True)
+        return cls.__engine

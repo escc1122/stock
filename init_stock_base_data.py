@@ -10,6 +10,7 @@ import time
 from model.stock_base_data import StockBaseData
 from sqlalchemy.orm import sessionmaker
 import datetime
+from customer_db import SqlAlchemy
 
 stock_array = customer_db.get_stock_ids()
 
@@ -22,7 +23,7 @@ no_found_id = []
 def insert_table(ids):
     stocks = twstock.realtime.get(ids.tolist())
     print(stocks['success'])
-    engine = customer_db.get_engine()
+    engine = SqlAlchemy.get_engine()
     Session = sessionmaker(bind=engine)
     today = datetime.datetime.today()
     today_str = "{}{:0>2d}{:0>2d}".format(today.year, today.month, today.day)
