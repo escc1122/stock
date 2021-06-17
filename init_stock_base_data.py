@@ -11,6 +11,7 @@ from model.stock_base_data import StockBaseData
 from sqlalchemy.orm import sessionmaker
 import datetime
 from customer_db import SqlAlchemy
+from sqlalchemy.dialects.postgresql import insert
 
 stock_array = customer_db.get_stock_ids()
 
@@ -46,30 +47,68 @@ def insert_table(ids):
                     if latest_trade_price == '-':
                         latest_trade_price = '-1'
 
-                    stock_base_data = StockBaseData(stock_date=today_str,
-                                                    stock_id=id,
-                                                    trade_volume=trade_volume,
-                                                    close_price=latest_trade_price,
-                                                    open_price=open_price
-                                                    )
+                    # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html?highlight=conflict#insert-on-conflict-upsert
+                    # https://stackoverflow.com/questions/7165998/how-to-do-an-upsert-with-sqlalchemy/7166559
+                    insert_stmt = insert(StockBaseData).values(stock_date=today_str,
+                                                               stock_id=id,
+                                                               trade_volume=trade_volume,
+                                                               close_price=latest_trade_price,
+                                                               open_price=open_price
+                                                               )
 
-                    session.add(stock_base_data)
+                    do_update_stmt = insert_stmt.on_conflict_do_update(
+                        index_elements=['stock_date', 'stock_id'],
+                        set_=dict(stock_date=today_str,
+                                  stock_id=id,
+                                  trade_volume=trade_volume,
+                                  close_price=latest_trade_price,
+                                  open_price=open_price
+                                  ))
 
-                    session.commit()
+                    session.execute(do_update_stmt)
+
+                    # stock_base_data = StockBaseData(stock_date=today_str,
+                    #                                 stock_id=id,
+                    #                                 trade_volume=trade_volume,
+                    #                                 close_price=latest_trade_price,
+                    #                                 open_price=open_price
+                    #                                 )
+                    #
+                    # session.add(stock_base_data)
+                    #
+                    # session.commit()
 
                 else:
                     print("id no found " + id)
                     no_found_id.append(id)
-                    stock_base_data = StockBaseData(stock_date=today_str,
-                                                    stock_id=id,
-                                                    trade_volume=-1,
-                                                    close_price=-1,
-                                                    open_price=-1
-                                                    )
 
-                    session.add(stock_base_data)
+                    insert_stmt = insert(StockBaseData).values(stock_date=today_str,
+                                                               stock_id=id,
+                                                               trade_volume=-1,
+                                                               close_price=-1,
+                                                               open_price=-1
+                                                               )
 
-                    session.commit()
+                    do_update_stmt = insert_stmt.on_conflict_do_update(
+                        index_elements=['stock_date', 'stock_id'],
+                        set_=dict(stock_date=today_str,
+                                  stock_id=id,
+                                  trade_volume=-1,
+                                  close_price=-1,
+                                  open_price=-1
+                                  ))
+
+                    session.execute(do_update_stmt)
+                    # stock_base_data = StockBaseData(stock_date=today_str,
+                    #                                 stock_id=id,
+                    #                                 trade_volume=-1,
+                    #                                 close_price=-1,
+                    #                                 open_price=-1
+                    #                                 )
+                    #
+                    # session.add(stock_base_data)
+                    #
+                    # session.commit()
     else:
         print("re")
         time.sleep(20)
