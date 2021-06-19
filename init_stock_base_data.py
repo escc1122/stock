@@ -28,6 +28,8 @@ def insert_table(ids):
     Session = sessionmaker(bind=engine)
     today = datetime.datetime.today()
     today_str = "{}{:0>2d}{:0>2d}".format(today.year, today.month, today.day)
+    #
+    # today_str = "20210618"
 
     if stocks['success']:
         for id in ids:
@@ -66,6 +68,7 @@ def insert_table(ids):
                                   ))
 
                     session.execute(do_update_stmt)
+                    session.commit()
 
                     # stock_base_data = StockBaseData(stock_date=today_str,
                     #                                 stock_id=id,
@@ -99,6 +102,7 @@ def insert_table(ids):
                                   ))
 
                     session.execute(do_update_stmt)
+                    session.commit()
                     # stock_base_data = StockBaseData(stock_date=today_str,
                     #                                 stock_id=id,
                     #                                 trade_volume=-1,
