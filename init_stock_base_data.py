@@ -301,10 +301,41 @@ def test2():
     print(error_list)
 
 
+def init():
+    from web_crawler import Yahoo
+    error_list = []
+    engine = SqlAlchemy.get_engine()
+    Session = sessionmaker(bind=engine)
+    with Session() as session:
+        stock_id_list = session.execute("SELECT  distinct  stock_id FROM public.stocks;").fetchall()
+        for row in stock_id_list:
+            stock_id = row["stock_id"].upper()
+            status_code, stock_base_data_model_list = Yahoo.get_stock_data_by_stock_id(stock_id)
+            for stock_base_data_model in stock_base_data_model_list:
+                if status_code == 200:
+                    insert_para = dict(stock_date=stock_base_data_model.stock_date,
+                                       stock_id=stock_id,
+                                       trade_volume=stock_base_data_model.trade_volume,
+                                       closing_price=stock_base_data_model.closing_price,
+                                       opening_price=stock_base_data_model.opening_price,
+                                       highest_price=stock_base_data_model.highest_price,
+                                       lowest_price=stock_base_data_model.lowest_price
+                                       )
+                    insert_stmt = insert(StockBaseData).values(insert_para)
+                    do_update_stmt = insert_stmt.on_conflict_do_update(
+                        index_elements=['stock_date', 'stock_id'],
+                        set_=insert_para)
+
+                    session.execute(do_update_stmt)
+                error_list.append(stock_id)
+            session.commit()
+    print(error_list)
+
+
 if __name__ == '__main__':
     # for ids in newarr:
     #     insert_table(ids)
     #     time.sleep(20)
 
     # fix_stock("20210619")
-    test2()
+    init()
