@@ -12,6 +12,8 @@ pip3 install lxml
 
 pip3 install SQLAlchemy
 
+pip3 install beautifulsoup4
+
 # 代理
 http://proxy-list.org/english/index.php
 
