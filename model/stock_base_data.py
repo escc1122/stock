@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, BIGINT, String, REAL
-import customer_db
+from customer_db import SqlAlchemy
 
 Base = declarative_base()
 
@@ -13,8 +13,10 @@ class StockBaseData(Base):
     stock_date = Column(String(8), primary_key=True)
     stock_id = Column(String(10), primary_key=True)
     trade_volume = Column(BIGINT)
-    close_price = Column(REAL)
-    open_price = Column(REAL)
+    closing_price = Column(REAL)
+    opening_price = Column(REAL)
+    lowest_price = Column(REAL)
+    highest_price = Column(REAL)
 
     __table_args__ = (
         # UniqueConstraint('id', 'name', name='uix_id_name'),
@@ -31,5 +33,5 @@ class StockBaseData(Base):
 #     )
 
 if __name__ == '__main__':
-    engine = customer_db.get_engine()
+    engine = SqlAlchemy.get_engine()
     Base.metadata.create_all(engine)
